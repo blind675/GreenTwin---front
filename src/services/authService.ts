@@ -19,7 +19,7 @@ export interface RegisterData extends LoginCredentials {
 const authService = {
   async login(credentials: LoginCredentials): Promise<User> {
     try {
-      const response = await api.post('/auth/login', credentials);
+      const response = await api.post('/users/login', credentials);
       const user = response.data;
 
       // Store token in localStorage
@@ -37,7 +37,7 @@ const authService = {
 
   async register(data: RegisterData): Promise<User> {
     try {
-      const response = await api.post('/auth/', data);
+      const response = await api.post('/users', data);
       const user = response.data;
 
       // Store token in localStorage
