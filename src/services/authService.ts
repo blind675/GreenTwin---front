@@ -37,7 +37,7 @@ const authService = {
 
   async register(data: RegisterData): Promise<User> {
     try {
-      const response = await api.post('/auth/register', data);
+      const response = await api.post('/auth/', data);
       const user = response.data;
 
       // Store token in localStorage
