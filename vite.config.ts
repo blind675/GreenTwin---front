@@ -1,5 +1,6 @@
 import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
+import { VitePWA } from 'vite-plugin-pwa';
 import * as path from 'path';
 
 // https://vitejs.dev/config/
@@ -8,7 +9,35 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd());
   
   return {
-    plugins: [react()],
+    plugins: [
+      react(),
+      VitePWA({
+        registerType: 'autoUpdate',
+        includeAssets: ['favicon.svg', 'icons/*.png'],
+        manifest: {
+          name: 'GreenTwin',
+          short_name: 'GreenTwin',
+          description: 'Tree Management System',
+          theme_color: '#6B8E76',
+          background_color: '#ffffff',
+          display: 'standalone',
+          icons: [
+            {
+              src: '/icons/icon-192x192.png',
+              sizes: '192x192',
+              type: 'image/png',
+              purpose: 'any maskable'
+            },
+            {
+              src: '/icons/icon-512x512.png',
+              sizes: '512x512',
+              type: 'image/png',
+              purpose: 'any maskable'
+            }
+          ]
+        }
+      }),
+    ],
     resolve: {
       alias: {
         '@': path.resolve(__dirname, './src'),
