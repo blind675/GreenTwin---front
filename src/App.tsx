@@ -13,6 +13,7 @@ interface Tree {
   latitude: number;
   longitude: number;
   lastWatered: string | null;
+  status: 'ALIVE' | 'DEAD';
   responsibleUserId: number | null;
   responsibleUser?: {
     name: string;
@@ -54,6 +55,7 @@ function App() {
           latitude: serviceTree.latitude,
           longitude: serviceTree.longitude,
           lastWatered: serviceTree.lastWateredAt,
+          status: serviceTree.status || 'ALIVE', // Include status field with default
           responsibleUserId: serviceTree.responsibleUser?.id || null,
           responsibleUser: serviceTree.responsibleUser ? {
             name: serviceTree.responsibleUser.name,
@@ -63,10 +65,9 @@ function App() {
         
         setTrees(mappedTrees);
         setError(null);
-      } catch (apiError) {
-        // If API fails, use sample data
-        console.log('API not available, using sample data');
-        setError('API not available, using sample data');
+      } catch (err) {
+        console.error('Error fetching trees from API:', err);
+        setError('Failed to load trees. Please try again later.');
       }
     } catch (err) {
       console.error('Error setting up tree data:', err);
@@ -132,6 +133,7 @@ function App() {
           .bindPopup(`
             <div>
               <h3 style="font-weight: bold;">${tree.scientificName}</h3>
+              <p>Status: <span style="color: ${tree.status === 'ALIVE' ? '#15803d' : '#dc2626'}; font-weight: bold;">${tree.status === 'ALIVE' ? 'Alive' : 'Dead'}</span></p>
               <p>Last watered: ${tree.lastWatered ? new Date(tree.lastWatered).toLocaleDateString() : 'Never'}</p>
               ${tree.responsibleUser ? `<p>Responsible: ${tree.responsibleUser.name}</p>` : ''}
             </div>

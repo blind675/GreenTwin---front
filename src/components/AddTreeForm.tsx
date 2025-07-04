@@ -1,5 +1,5 @@
 import { useState, useContext } from 'react';
-import { createTree } from '../services/treeService';
+import { createTree, TreeStatus } from '../services/treeService';
 import { AuthContext } from '../contexts/AuthContext';
 
 interface AddTreeFormProps {
@@ -11,6 +11,7 @@ interface AddTreeFormProps {
 
 const AddTreeForm: React.FC<AddTreeFormProps> = ({ latitude, longitude, onSuccess, onCancel }) => {
   const [scientificName, setScientificName] = useState<string>('');
+  const [status, setStatus] = useState<TreeStatus>('ALIVE');
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean>(false);
@@ -41,6 +42,7 @@ const AddTreeForm: React.FC<AddTreeFormProps> = ({ latitude, longitude, onSucces
         scientificName,
         latitude,
         longitude,
+        status,
         responsibleUserId: user.id // Include the current user's ID
       });
       
@@ -103,6 +105,21 @@ const AddTreeForm: React.FC<AddTreeFormProps> = ({ latitude, longitude, onSucces
               />
               <p style={{ fontSize: '12px', color: '#6b7280', marginTop: '5px' }}>
                 Enter the scientific name of the tree species
+              </p>
+            </div>
+            
+            <div style={{ marginBottom: '15px' }}>
+              <label style={{ display: 'block', marginBottom: '5px', color: '#333333' }}>Tree Status:</label>
+              <select
+                value={status}
+                onChange={(e) => setStatus(e.target.value as TreeStatus)}
+                style={{ width: '100%', padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }}
+              >
+                <option value="ALIVE">Alive</option>
+                <option value="DEAD">Dead</option>
+              </select>
+              <p style={{ fontSize: '12px', color: '#6b7280', marginTop: '5px' }}>
+                Select the current status of the tree
               </p>
             </div>
             

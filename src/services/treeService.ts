@@ -1,10 +1,13 @@
 import api from '../api';
 
+export type TreeStatus = 'ALIVE' | 'DEAD';
+
 export interface Tree {
   id: number;
   latitude: number;
   longitude: number;
   scientificName: string;
+  status: TreeStatus;
   lastWateredAt: string | null;
   createdAt: string;
   updatedAt: string;
@@ -34,6 +37,7 @@ export const createTree = async (treeData: {
   latitude: number;
   longitude: number;
   scientificName: string;
+  status?: TreeStatus;
   responsibleUserId?: number;
 }): Promise<Tree> => {
   try {
