@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { Tree, waterTree } from '../services/treeService';
+import logoImage from '../assets/logo.svg';
 
 interface SidebarProps {
   selectedTree: Tree | null;
@@ -38,9 +39,12 @@ const Sidebar = ({ selectedTree, onAddTree, onRefresh }: SidebarProps) => {
 
   return (
     <div className="sidebar h-screen w-80 p-6 overflow-y-auto">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-green-700">GreenTwin</h1>
-        <p className="text-sm text-gray-600">Tree Management System</p>
+      <div className="mb-6 flex items-center">
+        <img src={logoImage} alt="GreenTwin Logo" className="h-10 w-10 mr-2" />
+        <div>
+          <h1 className="text-2xl font-bold text-green-700">GreenTwin</h1>
+          <p className="text-sm text-gray-600">Tree Management System</p>
+        </div>
       </div>
       
       {user && (
