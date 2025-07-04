@@ -1,14 +1,7 @@
 import { createContext, useState, useEffect, ReactNode } from 'react';
-import axios from 'axios';
+import authService, { User } from '../services/authService';
 
-interface User {
-  id: number;
-  name: string;
-  email: string;
-  imageUrl?: string;
-  role: string;
-  token: string;
-}
+// Using User interface from authService
 
 interface AuthContextType {
   user: User | null;
@@ -37,29 +30,18 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is stored in localStorage
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      try {
-        const parsedUser = JSON.parse(storedUser);
-        setUser(parsedUser);
-        // Set authorization header for all future requests
-        axios.defaults.headers.common['Authorization'] = `Bearer ${parsedUser.token}`;
-      } catch (error) {
-        console.error('Error parsing stored user:', error);
-        localStorage.removeItem('user');
-      }
+    // Use authService to get the current user
+    const currentUser = authService.getCurrentUser();
+    if (currentUser) {
+      setUser(currentUser);
     }
     setLoading(false);
   }, []);
 
   const login = async (email: string, password: string) => {
     try {
-      const response = await axios.post('/api/users/login', { email, password });
-      const userData = response.data;
+      const userData = await authService.login({ email, password });
       setUser(userData);
-      localStorage.setItem('user', JSON.stringify(userData));
-      axios.defaults.headers.common['Authorization'] = `Bearer ${userData.token}`;
     } catch (error) {
       console.error('Login error:', error);
       throw error;
@@ -68,11 +50,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const register = async (name: string, email: string, password: string) => {
     try {
-      const response = await axios.post('/api/users', { name, email, password });
-      const userData = response.data;
+      const userData = await authService.register({ name, email, password });
       setUser(userData);
-      localStorage.setItem('user', JSON.stringify(userData));
-      axios.defaults.headers.common['Authorization'] = `Bearer ${userData.token}`;
     } catch (error) {
       console.error('Registration error:', error);
       throw error;
@@ -80,9 +59,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   const logout = () => {
+    authService.logout();
     setUser(null);
-    localStorage.removeItem('user');
-    delete axios.defaults.headers.common['Authorization'];
   };
 
   return (

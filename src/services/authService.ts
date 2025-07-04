@@ -16,14 +16,6 @@ export interface RegisterData extends LoginCredentials {
   name: string;
 }
 
-// Sample user for demonstration when API is not available
-const sampleUser: User = {
-  id: 1,
-  name: 'John Doe',
-  email: 'john@example.com',
-  token: 'sample-jwt-token'
-};
-
 const authService = {
   async login(credentials: LoginCredentials): Promise<User> {
     try {
@@ -38,13 +30,7 @@ const authService = {
 
       return user;
     } catch (error) {
-      console.log('API not available, using sample user');
-      // For demo purposes, accept any login when API is not available
-      if (credentials.email && credentials.password) {
-        localStorage.setItem('token', sampleUser.token!);
-        localStorage.setItem('user', JSON.stringify(sampleUser));
-        return sampleUser;
-      }
+      console.log('API not available');
       throw new Error('Invalid credentials');
     }
   },
