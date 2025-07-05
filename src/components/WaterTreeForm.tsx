@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { waterTree } from '../services/treeService';
+import { getPreciseLocation } from '../utils/locationUtils';
 import AddTreeForm from './AddTreeForm';
 
 interface WaterTreeFormProps {
@@ -12,7 +13,7 @@ const WaterTreeForm = ({ onSuccess, onCancel }: WaterTreeFormProps) => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [coordinates, setCoordinates] = useState<{ latitude: number; longitude: number } | null>(null);
-  const [locationStatus, setLocationStatus] = useState<'idle' | 'getting' | 'success' | 'error'>('idle');
+  const [locationStatus, setLocationStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [showAddTreeForm, setShowAddTreeForm] = useState(false);
 
   // Get current location when component mounts
@@ -20,29 +21,32 @@ const WaterTreeForm = ({ onSuccess, onCancel }: WaterTreeFormProps) => {
     getLocation();
   }, []);
 
-  const getLocation = () => {
+  const getLocation = async () => {
     if (!navigator.geolocation) {
       setError('Geolocation is not supported by your browser');
       setLocationStatus('error');
       return;
     }
 
-    setLocationStatus('getting');
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        setCoordinates({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude
-        });
-        setLocationStatus('success');
-      },
-      (error) => {
-        console.error('Error getting location:', error);
-        setError('Unable to retrieve your location. Please enable location services.');
-        setLocationStatus('error');
-      },
-      { enableHighAccuracy: true }
-    );
+    setLocationStatus('loading');
+    try {
+      // Get precise location with multiple samples
+      const preciseLocation = await getPreciseLocation({
+        samples: 5,        // Take 5 readings
+        timeout: 15000,    // 15 seconds total timeout
+        maxDistance: 10    // 10 meters max distance for valid readings
+      });
+
+      setCoordinates({
+        latitude: preciseLocation.latitude,
+        longitude: preciseLocation.longitude,
+      });
+      setLocationStatus('success');
+    } catch (error) {
+      console.error('Error getting precise location:', error);
+      setError('Unable to retrieve your location. Please enable location services.');
+      setLocationStatus('error');
+    }
   };
 
   const handleWaterTree = async () => {
@@ -107,7 +111,7 @@ const WaterTreeForm = ({ onSuccess, onCancel }: WaterTreeFormProps) => {
           <div style={{ marginBottom: '18px', padding: '15px', backgroundColor: '#f3f4f6', borderRadius: '4px' }}>
             <h3 style={{ fontSize: '16px', fontWeight: 'bold', marginBottom: '10px', color: '#333333' }}>Your Location</h3>
 
-            {locationStatus === 'getting' && (
+            {locationStatus === 'loading' && (
               <p style={{ color: '#6b7280' }}>Getting your current location...</p>
             )}
 
