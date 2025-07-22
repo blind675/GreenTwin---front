@@ -1,49 +1,62 @@
 # GreenTwin Frontend
 
-This is the frontend application for the GreenTwin tree management system. It provides a user interface for viewing, adding, and watering trees on an interactive map.
-
-## Setup
-
-1. Clone the repository
-2. Install dependencies:
-   ```
-   npm install
-   ```
-3. Set up your environment variables by copying `.env.example` to `.env` and adjusting values as needed:
-   ```
-   cp .env.example .env
-   ```
-
-## Running the Application
-
-For development:
-```
-npm run dev
-```
-
-For production:
-```
-npm run build
-npm run preview
-```
-
-## Environment Variables
-
-- `VITE_API_URL` - URL of the backend API (default: http://localhost:3000)
+A Next.js application for visualizing and managing tree data in Timișoara.
 
 ## Features
 
 - Interactive map showing tree locations
-- User authentication (login/register)
-- Add new trees to the map
-- Water trees at your current location
-- View tree details and watering history
+- Color-coded tree markers based on tree health status
+- User authentication system
+- Responsive design
 
 ## Technologies Used
 
-- React
+- Next.js
 - TypeScript
-- Vite
+- React
 - Leaflet for maps
-- Axios for API requests
 - Tailwind CSS for styling
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 14.x or higher
+- npm or yarn
+
+### Installation
+
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+### Development
+
+Run the development server:
+
+```bash
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
+
+### Building for Production
+
+```bash
+npm run build
+```
+
+### Running Production Build
+
+```bash
+npm start
+```
+
+## Project Structure
+
+- `src/app/` - Next.js app router pages
+- `src/components/` - Reusable React components
+- `src/styles/` - Global styles
+- `public/` - Static assets
