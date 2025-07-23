@@ -1,13 +1,12 @@
-'use client';
-
 import React, { useState, useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
-import { fetchTrees, Tree } from '../services/api';
+import { fetchTrees } from '../services/api';
+import type { Tree } from '../services/api';
 import TreeFilter from './TreeFilter';
 
-// Fix for default marker icons in Leaflet with Next.js
+// Fix for default marker icons in Leaflet
 const DefaultIcon = L.icon({
   iconUrl: '/marker-icon.png',
   shadowUrl: '/marker-shadow.png',
@@ -100,7 +99,8 @@ const Map: React.FC = () => {
   const [filteredTrees, setFilteredTrees] = useState<Tree[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedTree, setSelectedTree] = useState<Tree | null>(null);
+  // State for selected tree - used in marker click handler
+  const [, setSelectedTree] = useState<Tree | null>(null);
   const [filters, setFilters] = useState<{
     status: string[];
     types: string[];
@@ -114,7 +114,8 @@ const Map: React.FC = () => {
     needsAttention: 0,
     critical: 0
   });
-  const [treeTypes, setTreeTypes] = useState<string[]>([]);
+  // Store  // Tree types for filtering - will be populated from API data
+  const [, setTreeTypes] = useState<string[]>([]);
 
   const updateTreeStats = (treeData: Tree[]) => {
     const stats = {
@@ -239,8 +240,8 @@ const Map: React.FC = () => {
         ))}
       </MapContainer>
 
-      {/* Add some CSS for the tree popup styling */}
-      <style jsx global>{`
+      {/* CSS for the tree popup styling */}
+      <style>{`
         .tree-popup .status-healthy { color: green; }
         .tree-popup .status-needs-attention { color: orange; }
         .tree-popup .status-critical { color: red; }

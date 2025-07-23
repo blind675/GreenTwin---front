@@ -1,5 +1,3 @@
-'use client';
-
 import React from 'react';
 
 interface TreeFilterProps {
@@ -8,7 +6,8 @@ interface TreeFilterProps {
 }
 
 const TreeFilter: React.FC<TreeFilterProps> = ({ onFilterChange, selectedFilters }) => {
-  const statusOptions = ['Sănătos', 'Necesită atenție', 'Critic'];
+  // Status options are directly used in the JSX below
+  // ['Sănătos', 'Necesită atenție', 'Critic']
 
   const handleStatusChange = (status: string) => {
     let newStatus: string[];
@@ -24,6 +23,9 @@ const TreeFilter: React.FC<TreeFilterProps> = ({ onFilterChange, selectedFilters
     onFilterChange({ ...selectedFilters, status: newStatus });
   };
 
+  // Handler for tree type filter changes (currently not used in UI but kept for future implementation)
+  // Commented out until needed
+  /*
   const handleTypeChange = (type: string) => {
     let newTypes: string[];
 
@@ -37,6 +39,7 @@ const TreeFilter: React.FC<TreeFilterProps> = ({ onFilterChange, selectedFilters
 
     onFilterChange({ ...selectedFilters, types: newTypes });
   };
+  */
 
   return (
     <div className="bg-white bg-opacity-50 backdrop-blur-sm rounded-lg p-4 mb-4 border border-white border-opacity-30 shadow-lg">

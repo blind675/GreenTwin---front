@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body, #root {
+    @apply h-full w-full m-0 p-0;
+  }
+  
+  body {
+    @apply text-black bg-white;
+    font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+      Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+@layer components {
+  .header {
+    @apply bg-green-500 text-white h-20 flex justify-center items-center sticky top-0 left-0 right-0 z-50 w-full shadow-md;
+  }
+  
+  .auth-container {
+    @apply flex flex-col items-center justify-center min-h-[calc(100vh-80px)] p-8 bg-gray-50;
+  }
+  
+  .auth-form {
+    @apply w-full max-w-md p-8 bg-white rounded-lg shadow-md;
+  }
+}
+
+/* Leaflet map container */
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+}
+
+/* Tree popup styling */
+.tree-popup .status-sănătos { color: green; }
+.tree-popup .status-necesită-atenție { color: orange; }
+.tree-popup .status-critic { color: red; }
