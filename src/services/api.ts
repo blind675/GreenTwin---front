@@ -38,7 +38,27 @@ export interface TreeResponse {
   };
 }
 
+// Tipuri pentru datele despre copaci - actualizare
+export interface UpdateTreeInput {
+  scientificName?: string;
+  responsibleUserId?: number;
+}
+
 // Tipuri pentru datele despre utilizatori
+// Tipuri pentru schimbarea parolei
+export interface ChangePasswordInput {
+  currentPassword: string;
+  newPassword: string;
+}
+
+// Tipuri pentru resetarea parolei (admin)
+export interface ResetPasswordResponse {
+  message: string;
+  userId: number;
+  userName: string;
+  newPassword: string;
+}
+
 export interface User {
   id: number;
   name: string;
@@ -149,5 +169,186 @@ export async function fetchUsers(): Promise<User[]> {
   } catch (error) {
     console.error('Eroare la preluarea utilizatorilor:', error);
     throw error; // Aruncă din nou eroarea pentru a fi gestionată de componentă
+  }
+}
+
+// Funcție pentru a actualiza un copac (doar pentru admin)
+export async function updateTree(id: number, data: UpdateTreeInput): Promise<TreeResponse> {
+  try {
+    const token = localStorage.getItem('greentwin_token');
+    if (!token) {
+      throw new Error('Nu sunteți autentificat');
+    }
+
+    const response = await fetch(`${API_BASE_URL}/trees/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(data)
+    });
+
+    if (!response.ok) {
+      if (response.status === 403) {
+        throw new Error('Nu aveți permisiunea de a actualiza acest copac');
+      }
+      throw new Error(`Nu s-a putut actualiza copacul ${id}`);
+    }
+
+    const result = await response.json();
+    return result.tree;
+  } catch (error) {
+    console.error(`Eroare la actualizarea copacului ${id}:`, error);
+    throw error;
+  }
+}
+
+// Funcție pentru a șterge un copac (doar pentru admin)
+export async function deleteTree(id: number): Promise<{ message: string, deletedTreeId: number }> {
+  try {
+    const token = localStorage.getItem('greentwin_token');
+    if (!token) {
+      throw new Error('Nu sunteți autentificat');
+    }
+
+    const response = await fetch(`${API_BASE_URL}/trees/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      if (response.status === 403) {
+        throw new Error('Nu aveți permisiunea de a șterge acest copac');
+      }
+      throw new Error(`Nu s-a putut șterge copacul ${id}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error(`Eroare la ștergerea copacului ${id}:`, error);
+    throw error;
+  }
+}
+
+// Funcție pentru a uda toți copacii deodată (doar pentru admin)
+export async function waterAllTrees(): Promise<{ message: string, count: number }> {
+  try {
+    const token = localStorage.getItem('greentwin_token');
+    if (!token) {
+      throw new Error('Nu sunteți autentificat');
+    }
+
+    const response = await fetch(`${API_BASE_URL}/trees/water-all`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      if (response.status === 403) {
+        throw new Error('Nu aveți permisiunea de a uda toți copacii');
+      }
+      throw new Error('Nu s-au putut uda toți copacii');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Eroare la udarea tuturor copacilor:', error);
+    throw error;
+  }
+}
+
+// Funcție pentru a schimba parola utilizatorului curent
+export async function changePassword(data: ChangePasswordInput): Promise<{ message: string }> {
+  try {
+    const token = localStorage.getItem('greentwin_token');
+    if (!token) {
+      throw new Error('Nu sunteți autentificat');
+    }
+
+    const response = await fetch(`${API_BASE_URL}/users/password`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(data)
+    });
+
+    if (!response.ok) {
+      if (response.status === 400) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Eroare la schimbarea parolei');
+      }
+      throw new Error('Nu s-a putut schimba parola');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Eroare la schimbarea parolei:', error);
+    throw error;
+  }
+}
+
+// Funcție pentru a șterge contul utilizatorului curent
+export async function deleteAccount(): Promise<{ message: string }> {
+  try {
+    const token = localStorage.getItem('greentwin_token');
+    if (!token) {
+      throw new Error('Nu sunteți autentificat');
+    }
+
+    const response = await fetch(`${API_BASE_URL}/users/account`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error('Nu s-a putut șterge contul');
+    }
+
+    // Șterge token-ul din localStorage după ștergerea contului
+    localStorage.removeItem('greentwin_token');
+    localStorage.removeItem('greentwin_user');
+
+    return await response.json();
+  } catch (error) {
+    console.error('Eroare la ștergerea contului:', error);
+    throw error;
+  }
+}
+
+// Funcție pentru resetarea parolei unui utilizator (doar pentru admin)
+export async function resetUserPassword(userId: number): Promise<ResetPasswordResponse> {
+  try {
+    const token = localStorage.getItem('greentwin_token');
+    if (!token) {
+      throw new Error('Nu sunteți autentificat');
+    }
+
+    const response = await fetch(`${API_BASE_URL}/users/${userId}/reset-password`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      if (response.status === 403) {
+        throw new Error('Nu aveți permisiunea de a reseta parola');
+      }
+      throw new Error('Nu s-a putut reseta parola');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error(`Eroare la resetarea parolei pentru utilizatorul ${userId}:`, error);
+    throw error;
   }
 }
