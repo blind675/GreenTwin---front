@@ -179,6 +179,7 @@ const Map: React.FC = () => {
 
   return (
     <div className="relative h-full w-full">
+
       {/* Indicator de încărcare */}
       {loading && (
         <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center z-30 bg-white bg-opacity-70">

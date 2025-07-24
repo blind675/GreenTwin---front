@@ -15,13 +15,13 @@ function App() {
           <Routes>
             <Route path="/" element={<Map />} />
             <Route path="/auth" element={<AuthPage />} />
-            <Route 
-              path="/admin" 
+            <Route
+              path="/admin"
               element={
                 <ProtectedRoute requireAdmin={true}>
                   <AdminPage />
                 </ProtectedRoute>
-              } 
+              }
             />
           </Routes>
         </main>
