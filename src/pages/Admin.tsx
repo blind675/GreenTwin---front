@@ -19,6 +19,7 @@ export default function AdminPage() {
   const [isResettingPassword, setIsResettingPassword] = useState(false);
   const [resetPasswordResult, setResetPasswordResult] = useState<ResetPasswordResponse | null>(null);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const navigate = useNavigate();
   
   // Check if user is admin, redirect if not
@@ -112,6 +113,26 @@ export default function AdminPage() {
     }
   };
   
+  // Handle refresh trees data
+  const handleRefreshTrees = async () => {
+    try {
+      setIsRefreshing(true);
+      const treeData = await fetchTrees();
+      setTrees(treeData);
+      setSuccessMessage('Lista de copaci a fost actualizată cu succes!');
+      
+      // Clear success message after 3 seconds
+      setTimeout(() => {
+        setSuccessMessage('');
+      }, 3000);
+    } catch (err) {
+      console.error('Error refreshing trees:', err);
+      setError(err instanceof Error ? err.message : 'Eroare la actualizarea listei de copaci');
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
   // Handle water all trees
   const handleWaterAllTrees = async () => {
     if (window.confirm('Sigur doriți să udați toți copacii?')) {
@@ -258,13 +279,25 @@ export default function AdminPage() {
                   Gestionați copacii din aplicație
                 </p>
               </div>
-              <button 
-                onClick={handleWaterAllTrees}
-                disabled={isWateringAll}
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-blue-300"
-              >
-                {isWateringAll ? 'Se udă...' : 'Udă toți copacii'}
-              </button>
+              <div className="flex space-x-3">
+                <button 
+                  onClick={handleRefreshTrees}
+                  disabled={isRefreshing}
+                  className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:bg-green-300 flex items-center"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  {isRefreshing ? 'Se actualizează...' : 'Actualizează'}
+                </button>
+                <button 
+                  onClick={handleWaterAllTrees}
+                  disabled={isWateringAll}
+                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-blue-300"
+                >
+                  {isWateringAll ? 'Se udă...' : 'Udă toți copacii'}
+                </button>
+              </div>
             </div>
             <div className="overflow-x-auto overflow-y-auto" style={{ maxHeight: '60vh' }}>
               <table className="min-w-full divide-y divide-gray-200">
