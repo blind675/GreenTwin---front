@@ -233,6 +233,37 @@ export async function deleteTree(id: number): Promise<{ message: string, deleted
   }
 }
 
+// Funcție pentru a șterge mai mulți copaci deodată (doar pentru admin)
+export async function deleteTrees(ids: number[]): Promise<{ message: string, count: number, deletedTreeIds: number[] }> {
+  try {
+    const token = localStorage.getItem('greentwin_token');
+    if (!token) {
+      throw new Error('Nu sunteți autentificat');
+    }
+
+    const response = await fetch(`${API_BASE_URL}/trees/batch`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ treeIds: ids })
+    });
+
+    if (!response.ok) {
+      if (response.status === 403) {
+        throw new Error('Nu aveți permisiunea de a șterge acești copaci');
+      }
+      throw new Error('Nu s-au putut șterge copacii selectați');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Eroare la ștergerea copacilor:', error);
+    throw error;
+  }
+}
+
 // Funcție pentru a uda toți copacii deodată (doar pentru admin)
 export async function waterAllTrees(): Promise<{ message: string, count: number }> {
   try {

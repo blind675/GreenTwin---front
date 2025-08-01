@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getCurrentUser, isAdmin, logout } from '../services/auth';
-import { fetchTrees, fetchUsers, deleteTree, updateTree, waterAllTrees, resetUserPassword } from '../services/api';
+import { fetchTrees, fetchUsers, deleteTree, deleteTrees, updateTree, waterAllTrees, resetUserPassword } from '../services/api';
 import type { Tree, User, UpdateTreeInput, ResetPasswordResponse } from '../services/api';
 
 export default function AdminPage() {
@@ -20,6 +20,8 @@ export default function AdminPage() {
   const [resetPasswordResult, setResetPasswordResult] = useState<ResetPasswordResponse | null>(null);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [selectedTreeIds, setSelectedTreeIds] = useState<number[]>([]);
+  const [isBatchDeleting, setIsBatchDeleting] = useState(false);
   const navigate = useNavigate();
   
   // Check if user is admin, redirect if not
@@ -61,6 +63,8 @@ export default function AdminPage() {
         setIsDeleting(true);
         const result = await deleteTree(id);
         setTrees(trees.filter(tree => tree.id !== id));
+        // Clear selected trees if the deleted one was selected
+        setSelectedTreeIds(prev => prev.filter(treeId => treeId !== id));
         setSuccessMessage(result.message || 'Copacul a fost șters cu succes!');
         
         // Clear success message after 3 seconds
@@ -73,6 +77,56 @@ export default function AdminPage() {
       } finally {
         setIsDeleting(false);
       }
+    }
+  };
+  
+  // Handle batch deletion of trees
+  const handleBatchDeleteTrees = async () => {
+    if (selectedTreeIds.length === 0) {
+      setError('Nu ați selectat niciun copac pentru ștergere');
+      return;
+    }
+    
+    if (window.confirm(`Sigur doriți să ștergeți ${selectedTreeIds.length} copaci selectați?`)) {
+      try {
+        setIsBatchDeleting(true);
+        const result = await deleteTrees(selectedTreeIds);
+        setTrees(trees.filter(tree => !selectedTreeIds.includes(tree.id)));
+        setSelectedTreeIds([]);
+        setSuccessMessage(result.message || `${result.count} copaci au fost șterși cu succes!`);
+        
+        // Clear success message after 3 seconds
+        setTimeout(() => {
+          setSuccessMessage('');
+        }, 3000);
+      } catch (err) {
+        console.error('Error batch deleting trees:', err);
+        setError(err instanceof Error ? err.message : 'Eroare la ștergerea copacilor selectați');
+      } finally {
+        setIsBatchDeleting(false);
+      }
+    }
+  };
+  
+  // Handle tree selection toggle
+  const handleTreeSelectionToggle = (id: number) => {
+    setSelectedTreeIds(prev => {
+      if (prev.includes(id)) {
+        return prev.filter(treeId => treeId !== id);
+      } else {
+        return [...prev, id];
+      }
+    });
+  };
+  
+  // Handle select all trees
+  const handleSelectAllTrees = () => {
+    if (selectedTreeIds.length === trees.length) {
+      // If all trees are selected, deselect all
+      setSelectedTreeIds([]);
+    } else {
+      // Otherwise select all trees
+      setSelectedTreeIds(trees.map(tree => tree.id));
     }
   };
   
@@ -297,12 +351,32 @@ export default function AdminPage() {
                 >
                   {isWateringAll ? 'Se udă...' : 'Udă toți copacii'}
                 </button>
+                <button 
+                  onClick={handleBatchDeleteTrees}
+                  disabled={isBatchDeleting || selectedTreeIds.length === 0}
+                  className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 disabled:bg-red-300 flex items-center"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                  {isBatchDeleting ? 'Se șterg...' : `Șterge (${selectedTreeIds.length})`}
+                </button>
               </div>
             </div>
             <div className="overflow-x-auto overflow-y-auto" style={{ maxHeight: '60vh' }}>
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
+                    <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <div className="flex items-center">
+                        <input
+                          type="checkbox"
+                          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                          checked={selectedTreeIds.length > 0 && selectedTreeIds.length === trees.length}
+                          onChange={handleSelectAllTrees}
+                        />
+                      </div>
+                    </th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       ID
                     </th>
@@ -328,7 +402,17 @@ export default function AdminPage() {
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {trees.map((tree) => (
-                    <tr key={tree.id}>
+                    <tr key={tree.id} className={selectedTreeIds.includes(tree.id) ? 'bg-blue-50' : ''}>
+                      <td className="px-3 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                            checked={selectedTreeIds.includes(tree.id)}
+                            onChange={() => handleTreeSelectionToggle(tree.id)}
+                          />
+                        </div>
+                      </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {tree.id}
                       </td>
