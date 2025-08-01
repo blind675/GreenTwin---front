@@ -71,7 +71,8 @@ const TreeMarker: React.FC<TreeMarkerProps> = ({ tree, onSelectTree }) => {
     >
       <Popup>
         <div className="tree-popup">
-          <h3 className="font-bold">Copac {tree.type}</h3>
+          <h3 className="font-bold">{tree.name ? tree.name : `Copac ${tree.id}`}</h3>
+          <p className="text-sm text-gray-600 mb-2">{tree.type}</p>
           <p className={`status-${tree.status.toLowerCase().replace(' ', '-')}`}>
             Stare: <span className="font-semibold">{tree.status}</span>
           </p>

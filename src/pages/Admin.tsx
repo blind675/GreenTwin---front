@@ -134,6 +134,7 @@ export default function AdminPage() {
   const handleOpenUpdateModal = (tree: Tree) => {
     setSelectedTree(tree);
     setUpdatedTreeData({
+      name: tree.name,
       scientificName: tree.type,
       responsibleUserId: tree.responsibleUser?.id
     });
@@ -381,6 +382,9 @@ export default function AdminPage() {
                       ID
                     </th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Nume
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Tip
                     </th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -415,6 +419,9 @@ export default function AdminPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {tree.id}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {tree.name || '-'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         {tree.type}
@@ -582,6 +589,17 @@ export default function AdminPage() {
             </div>
             
             <div className="space-y-4">
+              <div>
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700">Nume</label>
+                <input
+                  type="text"
+                  id="name"
+                  value={updatedTreeData.name || ''}
+                  onChange={(e) => setUpdatedTreeData({...updatedTreeData, name: e.target.value})}
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              
               <div>
                 <label htmlFor="scientificName" className="block text-sm font-medium text-gray-700">Nume Științific</label>
                 <input

@@ -1,6 +1,7 @@
 // Tipuri pentru datele despre copaci
 export interface Tree {
   id: number;
+  name: string;
   lat: number;
   lng: number;
   type: string;
@@ -21,6 +22,7 @@ export interface Tree {
 // Tipuri pentru datele despre copaci
 export interface TreeResponse {
   id: number;
+  name: string;
   latitude: number;
   longitude: number;
   scientificName: string;
@@ -40,6 +42,7 @@ export interface TreeResponse {
 
 // Tipuri pentru datele despre copaci - actualizare
 export interface UpdateTreeInput {
+  name?: string;
   scientificName?: string;
   responsibleUserId?: number;
 }
@@ -90,6 +93,7 @@ export async function fetchTrees(): Promise<Tree[]> {
     // Transformă datele pentru a se potrivi cu modelul frontend
     return trees.map((tree: TreeResponse) => ({
       id: tree.id,
+      name: tree.name,
       lat: tree.latitude,
       lng: tree.longitude,
       type: tree.scientificName,
@@ -130,6 +134,7 @@ export async function fetchTreeById(id: number): Promise<Tree | null> {
     // Transformă datele pentru a se potrivi cu modelul frontend
     return {
       id: tree.id,
+      name: tree.name,
       lat: tree.latitude,
       lng: tree.longitude,
       type: tree.scientificName,
