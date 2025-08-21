@@ -114,7 +114,7 @@ export function getTreeStatus(lastWateredAt: string): string {
   const lastWatered = new Date(lastWateredAt);
   const diffDays = Math.floor((now.getTime() - lastWatered.getTime()) / (1000 * 60 * 60 * 24));
 
-  if (diffDays <= 2) {
+  if (diffDays <= 1) {
     return 'Sănătos';
   } else if (diffDays <= 4) {
     return 'Necesită atenție';
